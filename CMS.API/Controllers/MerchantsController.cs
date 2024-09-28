@@ -1,5 +1,7 @@
-﻿using CMS.DAL.Models;
+﻿using CMS.API.Extensions;
+using CMS.DAL.Models;
 using CMS.DAL.Repository.Interface;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +12,13 @@ namespace CMS.API.Controllers
     public class MerchantsController : ControllerBase
     {
         private readonly IGenericRepository<Merchant> _repository;
+        private readonly IValidator<Merchant> _validator;
 
-        public MerchantsController(IGenericRepository<Merchant> repository)
+        public MerchantsController(IGenericRepository<Merchant> repository,
+            IValidator<Merchant> validator)
         {
             _repository = repository;
+            _validator = validator;
         }
 
         [HttpGet("{Id}")]
@@ -34,11 +39,20 @@ namespace CMS.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Merchant item)
         {
+            var result = await _validator.ValidateAsync(item);
+            if (result.IsValid)
+            {
+                var merchantTask = await _repository.Add(item);
+                var merchant = merchantTask;
+                return Ok(merchant);
+            }
+            else
+            {
+                result.AddToModelState(this.ModelState);
 
-            var merchantTask = await _repository.Add(item);
-            var merchant = merchantTask;
+                return BadRequest(result);
+            }
 
-            return Ok(merchant);
         }
         [HttpPut]
         public async Task<IActionResult> Update(Guid Id, Merchant merchant)

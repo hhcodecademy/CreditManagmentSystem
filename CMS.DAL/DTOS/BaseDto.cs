@@ -9,5 +9,7 @@ namespace CMS.DAL.DTOS
     public class BaseDto
     {
         public Guid Id { get; set; }
+        public DateTime CreatedTime { get; set; }
+        public DateTime UpdatedTime { get; set; }
     }
 }

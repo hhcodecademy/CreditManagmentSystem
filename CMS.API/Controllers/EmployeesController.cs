@@ -1,6 +1,9 @@
-﻿using CMS.BLL.Services.Interface;
+﻿using CMS.API.Extensions;
+using CMS.BLL.Services.Interface;
 using CMS.DAL.DTOS;
 using CMS.DAL.Models;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +14,7 @@ namespace CMS.API.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly IGenericService<Employee,EmployeeDto> _employeeService;
+        private readonly IValidator<EmployeeDto> _validator;
 
         public EmployeesController(IGenericService<Employee, EmployeeDto> employeeService)
         {
@@ -34,8 +38,20 @@ namespace CMS.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(EmployeeDto dto)
         {
-            var result = await _employeeService.Add(dto);
-            return Ok(result);
+
+            ValidationResult result = await _validator.ValidateAsync(dto);
+            if (result.IsValid)
+            {
+                var res = await _employeeService.Add(dto);
+                return Ok(res);
+            }
+            else
+            {
+                result.AddToModelState(this.ModelState);
+
+                return BadRequest(result);
+            }
+       
         }
     }
 }

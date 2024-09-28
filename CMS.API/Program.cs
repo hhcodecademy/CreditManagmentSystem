@@ -1,10 +1,13 @@
 
+using CMS.API.Validation;
 using CMS.BLL.Mappers;
 using CMS.BLL.Services;
 using CMS.BLL.Services.Interface;
 using CMS.DAL.Data;
+using CMS.DAL.DTOS;
 using CMS.DAL.Repository;
 using CMS.DAL.Repository.Interface;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -33,6 +36,11 @@ namespace CMS.API
             builder.Services.AddScoped(typeof(IGenericService<,>),typeof(GenericService<,>));
 
             builder.Services.AddAutoMapper(Assembly.GetAssembly(typeof(CustomProfile)));
+
+            builder.Services.AddValidatorsFromAssembly(Assembly.GetAssembly(typeof(BranchValidator)));
+            builder.Services.AddValidatorsFromAssembly(Assembly.GetAssembly(typeof(MerchantValidator)));
+
+            //  builder.Services.AddScoped<IValidator<BranchDto>, BranchValidator>();
 
             var app = builder.Build();
 
