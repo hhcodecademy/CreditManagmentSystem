@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace CMS.DAL.DTOS
 {
-    public class BaseDto
+    public class CategoryDto:BaseDto
     {
-        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
     }
 }

@@ -14,8 +14,6 @@ namespace CMS.API.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly IGenericService<Employee,EmployeeDto> _employeeService;
-        private readonly IValidator<EmployeeDto> _validator;
-
         public EmployeesController(IGenericService<Employee, EmployeeDto> employeeService)
         {
             _employeeService = employeeService;
@@ -39,18 +37,10 @@ namespace CMS.API.Controllers
         public async Task<IActionResult> Create(EmployeeDto dto)
         {
 
-            ValidationResult result = await _validator.ValidateAsync(dto);
-            if (result.IsValid)
-            {
+           
                 var res = await _employeeService.Add(dto);
                 return Ok(res);
-            }
-            else
-            {
-                result.AddToModelState(this.ModelState);
-
-                return BadRequest(result);
-            }
+            
        
         }
     }

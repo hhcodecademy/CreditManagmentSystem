@@ -8,7 +8,7 @@ namespace CMS.API.Validation
     {
         public BranchValidator()
         {
-            RuleFor(x => x.Name).NotEmpty().WithMessage("Adini mutleq doldurun");
+            RuleFor(x => x.Name).NotEmpty().WithName("Ad").MinimumLength(3);
             RuleFor(x => x.Description).NotEmpty();
             RuleFor(x => x.MerchantId).NotNull();
             RuleFor(x=>x.Address).NotEmpty();

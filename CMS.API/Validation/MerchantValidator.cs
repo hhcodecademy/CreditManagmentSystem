@@ -8,8 +8,8 @@ namespace CMS.API.Validation
         public MerchantValidator()
         {
             RuleFor(x => x.Name).NotEmpty();
-            RuleFor(x => x.Description).Length(50);
-            RuleFor(x => x.TerminalNo).NotNull().Length(16);
+            RuleFor(x => x.Description);
+            RuleFor(x => x.TerminalNo).NotNull();
 
 
         }

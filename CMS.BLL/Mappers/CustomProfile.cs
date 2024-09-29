@@ -15,6 +15,8 @@ namespace CMS.BLL.Mappers
         {
             CreateMap<BranchDto, Branch>().ReverseMap();
             CreateMap<EmployeeDto, Employee>().ReverseMap();
+            CreateMap<CategoryDto, Category>().ReverseMap();
+            CreateMap<ProductDto, Product>().ReverseMap();
         }
     }
 }

@@ -8,8 +8,10 @@ using CMS.DAL.DTOS;
 using CMS.DAL.Repository;
 using CMS.DAL.Repository.Interface;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using System.Reflection;
 
 namespace CMS.API
@@ -19,6 +21,15 @@ namespace CMS.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            var logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(new ConfigurationBuilder()
+                .AddJsonFile("seri-log.config.json")
+                .Build())
+                .Enrich.FromLogContext()
+                .CreateLogger();
+            builder.Logging.ClearProviders();
+            builder.Logging.AddSerilog(logger);
 
             // Add services to the container.
 
@@ -32,15 +43,14 @@ namespace CMS.API
                 opts.UseSqlServer(builder.Configuration.GetConnectionString("SQLConnectionString"));
             });
 
-            builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
-            builder.Services.AddScoped(typeof(IGenericService<,>),typeof(GenericService<,>));
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped(typeof(IGenericService<,>), typeof(GenericService<,>));
 
             builder.Services.AddAutoMapper(Assembly.GetAssembly(typeof(CustomProfile)));
 
-            builder.Services.AddValidatorsFromAssembly(Assembly.GetAssembly(typeof(BranchValidator)));
-            builder.Services.AddValidatorsFromAssembly(Assembly.GetAssembly(typeof(MerchantValidator)));
+            builder.Services.AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining(typeof(BranchValidator)));
+            ValidatorOptions.Global.LanguageManager.Culture = new System.Globalization.CultureInfo("az");
 
-            //  builder.Services.AddScoped<IValidator<BranchDto>, BranchValidator>();
 
             var app = builder.Build();
 

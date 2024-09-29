@@ -6,6 +6,7 @@ using CMS.DAL.Repository.Interface;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Runtime.InteropServices;
 
 namespace CMS.API.Controllers
@@ -15,17 +16,18 @@ namespace CMS.API.Controllers
     public class BranchsController : ControllerBase
     {
         private readonly IGenericService<Branch, BranchDto> _branchService;
-        private readonly IValidator<BranchDto> _validator;
-        public BranchsController(IGenericService<Branch, BranchDto> branchService, IValidator<BranchDto> validator)
+        private readonly ILogger<BranchsController> _logger;
+        public BranchsController(IGenericService<Branch, BranchDto> branchService, ILogger<BranchsController> logger)
         {
             _branchService = branchService;
-            _validator = validator;
+            _logger = logger;
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
             var result = await _branchService.Get(id);
+            _logger.LogInformation($"Id: {id} get request");
 
             return Ok(result);
         }
@@ -41,18 +43,10 @@ namespace CMS.API.Controllers
         public async Task<IActionResult> Create(BranchDto itemDto)
         {
 
-            ValidationResult result = await _validator.ValidateAsync(itemDto);
-            if (result.IsValid)
-            {
+          
                 var responseDto = await _branchService.Add(itemDto);
                 return Ok(responseDto);
-            }
-            else
-            {
-                result.AddToModelState(this.ModelState);
-
-                return BadRequest(result);
-            }
+           
 
         }
     }
